@@ -1,29 +1,57 @@
-# capitaineai-com-pages
+# capitaineai-pages
 
-GitHub Pages source for [capitaineai.com](https://capitaineai.com).
+A Python library for page/document management — content modeling, versioning, templating, navigation, and search.
 
-Part of the **Cocapn Fleet** — a constellation of domain-specific landing pages and AI agents.
+## Installation
 
-## About
+```bash
+pip install capitaineai-pages
+```
 
-This repository contains the static site assets (HTML, CSS, images) deployed to GitHub Pages for the capitaineai.com domain.
+## Quick Start
 
-## Fleet Context
+```python
+from capitaineai_pages import Page, Document, TemplateEngine, NavigationBuilder, SearchEngine
 
-The Cocapn Fleet operates 20+ interconnected domains, each with its own personality and purpose:
+# Create pages with versioning
+page = Page(title="Getting Started", content="Welcome to the guide!")
+page.update(content="Updated guide with more detail", message="Revise intro")
 
-- 🦀 [cocapn.ai](https://cocapn.ai) — Fleet hub
-- 🎮 [dmlog.ai](https://dmlog.ai) — Tabletop RPG tools
-- 🔨 [makerlog.ai](https://makerlog.ai) — Maker project tracking
-- 🌙 [luciddreamer.ai](https://luciddreamer.ai) — Lucid dreaming journal
-- 📚 [studylog.ai](https://studylog.ai) — Study partner
-- 🎣 [fishinglog.ai](https://fishinglog.ai) — Fishing intelligence
-- 🎮 [playerlog.ai](https://playerlog.ai) — Gaming tracker
-- 🔮 [purplepincher.org](https://purplepincher.org) — Agent connection portal
-- And more...
+# Assemble into a document
+doc = Document(title="User Guide")
+doc.add_page(page)
+print(doc.toc_to_markdown())
 
-## Links
+# Full-text search
+engine = SearchEngine()
+engine.index_all(doc.pages)
+results = engine.search("guide")
 
-- Live site: https://capitaineai.com
-- Fleet hub: https://cocapn.ai
-- Fleet dashboard: http://147.224.38.131:4046/
+# Template rendering
+tmpl = TemplateEngine()
+tmpl.register("page", "# {{ title | title }}\n\n{{ content }}")
+print(tmpl.render("page", {"title": "hello world", "content": "Body text"}))
+
+# Navigation & sitemap
+nav = NavigationBuilder(base_url="https://example.com")
+print(nav.sitemap(doc.pages))
+```
+
+## Modules
+
+- **`page`** — `Page` class with content, metadata, tags, slug generation, and full version history (commit, revert, diff)
+- **`document`** — `Document` assembling pages with TOC generation, rendering, and word/char counts
+- **`template`** — `TemplateEngine` with `{{ variable }}` substitution, filters (`upper`, `lower`, `title`), `{% for %}` loops, `{% if %}` conditionals, and custom filters
+- **`navigation`** — `NavigationBuilder` with breadcrumbs, menu, hierarchical tree, and XML sitemap
+- **`search`** — `SearchEngine` with TF-IDF scoring, snippets, and term suggestions
+
+## Requirements
+
+- Python 3.8+
+- No external dependencies (pytest for testing only)
+
+## Development
+
+```bash
+python3 -m pytest tests/ -q
+```
